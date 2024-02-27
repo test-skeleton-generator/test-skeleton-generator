@@ -39,9 +39,18 @@ class RubyTestSkeletonGenerator
 
   def extract_class_name
     read_file = File.open("./#{@read_file_path}", "r")
-    class_name_line = read_file.find { |line| line =~ /class / && !line.start_with?('#') }
-    class_name_tokens = class_name_line.split(/\s/)
-    class_name_tokens[class_name_tokens.find_index("class") + 1]
+
+    class_name_line = read_file.find do |line|
+      line =~ /^\s*(class|module)\b/ && !line.start_with?('#')
+    end
+
+    class_name_tokens = class_name_line.split(/\s+/)
+
+    if class_name_tokens.include?("class")
+      return class_name_tokens[class_name_tokens.find_index("class") + 1]
+    else class_name_tokens.include?("module")
+      return class_name_tokens[class_name_tokens.find_index("module") + 1]
+    end
   end
 
   def generate_method_tests(read_file_contents, write_file)
